@@ -64,6 +64,7 @@ def parse_events(ical_data, start_day=0, end_day=2):
         return []
 
 class CalendarRequestHandler(BaseHTTPRequestHandler):
+    protocol_version = 'HTTP/1.1'
     def do_GET(self):
         # Parse URL and query parameters
         parsed_url = urlparse(self.path)
@@ -88,47 +89,38 @@ class CalendarRequestHandler(BaseHTTPRequestHandler):
             events = parse_events(ical_data, start_day, end_day)
             
             if plaintext:
-                # Send plaintext response
-                self.send_response(200)
-                self.send_header('Content-Type', 'text/plain; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                
                 # Create plaintext response with one event summary per line
                 response_text = '\n'.join(event['summary'] for event in events)
                 if not response_text:
                     response_text = 'No events found.'
-                self.wfile.write(response_text.encode('utf-8'))
+                self.write_response(200, 'text/plain; charset=utf-8', response_text)
             else:
-                # Send JSON response
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                
                 response_data = {
                     'status': 'success',
                     'events': events,
                     'count': len(events)
                 }
                 response_json = json.dumps(response_data, indent=2, ensure_ascii=False)
-                self.wfile.write(response_json.encode('utf-8'))
+                self.write_response(200, 'application/json; charset=utf-8', response_json)
         else:
-            # Send error response in appropriate format
-            self.send_response(200)
             if plaintext:
                 self.send_header('Content-Type', 'text/plain; charset=utf-8')
                 error_message = 'Failed to retrieve iCal data'
+                self.write_response(400, 'text/plain; charset=utf-8', error_message)
             else:
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
                 error_message = json.dumps({
                     'status': 'error',
                     'message': 'Failed to retrieve iCal data'
                 }, ensure_ascii=False)
-            
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(error_message.encode('utf-8'))
+                self.write_response(400, 'application/json; charset=utf-8', error_message)
+
+    def write_response(self, status_code, content_type, content):
+        response = content.encode('utf-8')
+        self.send_response(status_code)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(response)))
+        self.end_headers()
+        self.wfile.write(response)
 
 def run_server(port=8080):
     server_address = ('', port)
