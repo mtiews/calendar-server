@@ -17,4 +17,4 @@ COPY src/ ./src/
 EXPOSE 8080
 
 # Set the entry point
-CMD ["python", "src/calendar_filter.py"]
+CMD ["python", "-u", "src/calendar_filter.py"]

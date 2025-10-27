@@ -9,6 +9,7 @@ from urllib.parse import parse_qs, urlparse
 def download_ical(url):
     """Download iCal file from URL."""
     try:
+        # print(f"Downloading calendar file from {url}")
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for bad status codes
         return response.text
@@ -139,6 +140,8 @@ def run_server(port=8080):
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
+    except Exception as e:
+        print(f"Unexpectend error: {e}")
     finally:
         httpd.server_close()
         print("\nServer has been shut down.")
