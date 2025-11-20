@@ -80,8 +80,8 @@ class CalendarRequestHandler(BaseHTTPRequestHandler):
         # Validate parameters
         if start_day < 0:
             start_day = 0
-        if end_day <= start_day:
-            end_day = start_day + 1
+        if end_day < start_day:
+            end_day = start_day
 
         # Download and parse the calendar
         ical_data = download_ical(ical_url)
