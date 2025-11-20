@@ -10,7 +10,6 @@ This is a small support project for my ESP32-S3 based e-Paper displays where I'm
 - Filter events by date range using day offsets (0 = today, 1 = tomorrow, etc.)
 - Support for both JSON and plain text output formats
 - Proper UTC timezone handling
-- CORS enabled for cross-origin requests
 - Docker support for easy deployment
 
 ## Getting Started
@@ -169,4 +168,5 @@ The server handles various error cases:
 2. Create your feature branch
 3. Commit your changes
 4. Push to the branch
+
 5. Create a new Pull Request
